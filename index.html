@@ -4,88 +4,96 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Vijeta — SIH 25073 Prototype</title>
-  <!-- Tailwind CDN -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { theme: { extend: { colors: { govnavy: '#0A1A3B', govorange: '#FF6A00' } } } }</script>
-  <!-- React CDN -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <!-- Lucide icons UMD -->
-  <script src="https://unpkg.com/lucide@0.452.0/dist/umd/lucide.js"></script>
+  <script>tailwind.config = { theme: { extend: { colors: { govnavy:'#0A1A3B', govorange:'#FF6A00' } } } }</script>
+  <!-- React (production) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide@0.452.0/dist/umd/lucide.min.js"></script>
   <style>
     html,body,#root { height:100%; }
-    .hero-bg {
-      background: linear-gradient(135deg, #0A1A3B, #152a5f);
-      position: relative;
-      overflow: hidden;
-    }
-    .hero-bg::before {
-      content: "";
-      position: absolute; inset:0;
+    .hero-bg { background: linear-gradient(135deg, #0A1A3B, #152a5f); position: relative; overflow: hidden; }
+    .hero-bg::before { content:""; position:absolute; inset:0;
       background-image:url('https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1960&auto=format&fit=crop');
-      background-size:cover; background-position:center;
-      opacity:.35;
-    }
+      background-size:cover; background-position:center; opacity:.35; }
   </style>
 </head>
 <body class="bg-govnavy">
   <div id="root"></div>
 
   <script>
-    const TESTS = [{"id": 1, "name": "Height", "quality": "Anthropometry", "metric": "cm", "time": "~1\u20132 min", "setup": ["Portrait camera facing athlete", "Back to wall with height scale overlay", "AI reads head-to-floor scale"]}, {"id": 2, "name": "Weight", "quality": "Anthropometry", "metric": "kg", "time": "~1 min", "setup": ["Manual entry + photo of scale", "OCR digits + face match"]}, {"id": 3, "name": "Sit & Reach", "quality": "Flexibility", "metric": "cm", "time": "~2\u20133 min", "setup": ["Side-on camera", "Feet on box; zero mark visible", "AI measures fingertip reach"]}, {"id": 4, "name": "Standing Vertical Jump", "quality": "Explosive Strength (Lower)", "metric": "cm", "time": "~2\u20133 min", "setup": ["Side-on camera", "Mark standing reach", "AI apex minus reach"]}, {"id": 5, "name": "Standing Broad Jump", "quality": "Explosive Strength (Lower)", "metric": "cm", "time": "~2\u20133 min", "setup": ["Side-on camera", "Tape from toes; landing heels visible"]}, {"id": 6, "name": "Medicine Ball Throw", "quality": "Strength (Upper)", "metric": "m", "time": "~2\u20133 min", "setup": ["45\u00b0 angle camera", "Baseline marked; first-ground-contact"]}, {"id": 7, "name": "30 m Standing Start", "quality": "Speed", "metric": "s", "time": "~2\u20133 min", "setup": ["Two cones (0\u201330m)", "Camera near finish line", "AI start signal + finish crossing"]}, {"id": 8, "name": "4 \u00d7 10 m Shuttle Run", "quality": "Agility", "metric": "s", "time": "~3\u20134 min", "setup": ["Two lines 10 m apart", "Side-on camera", "AI line touches + total time"]}, {"id": 9, "name": "Sit-ups (60s)", "quality": "Core Strength", "metric": "reps", "time": "~2\u20133 min", "setup": ["45\u00b0 camera", "Knees bent; form checks"]}, {"id": 10, "name": "Endurance Run", "quality": "Endurance", "metric": "time", "time": "~6\u201312 min", "setup": ["Outdoor track preferred", "U-12: 800m; 12+: 1.6km", "GPS if available; fallback timing"]}];
+    /* ---- Annexure tests ---- */
+    const TESTS = [
+      {id:1,name:"Height",quality:"Anthropometry",metric:"cm",time:"~1–2 min",
+        setup:["Portrait camera facing athlete","Back to wall with height scale overlay","AI reads head-to-floor scale"]},
+      {id:2,name:"Weight",quality:"Anthropometry",metric:"kg",time:"~1 min",
+        setup:["Manual entry + photo of scale","OCR digits + face match"]},
+      {id:3,name:"Sit & Reach",quality:"Flexibility",metric:"cm",time:"~2–3 min",
+        setup:["Side-on camera","Feet on box; zero mark visible","AI measures fingertip reach"]},
+      {id:4,name:"Standing Vertical Jump",quality:"Explosive Strength (Lower)",metric:"cm",time:"~2–3 min",
+        setup:["Side-on camera","Mark standing reach","AI apex minus reach"]},
+      {id:5,name:"Standing Broad Jump",quality:"Explosive Strength (Lower)",metric:"cm",time:"~2–3 min",
+        setup:["Side-on camera","Tape from toes; landing heels visible"]},
+      {id:6,name:"Medicine Ball Throw",quality:"Strength (Upper)",metric:"m",time:"~2–3 min",
+        setup:["45° angle camera","Baseline marked; first-ground-contact"]},
+      {id:7,name:"30 m Standing Start",quality:"Speed",metric:"s",time:"~2–3 min",
+        setup:["Two cones (0–30m)","Camera near finish line","AI start signal + finish crossing"]},
+      {id:8,name:"4 × 10 m Shuttle Run",quality:"Agility",metric:"s",time:"~3–4 min",
+        setup:["Two lines 10 m apart","Side-on camera","AI line touches + total time"]},
+      {id:9,name:"Sit-ups (60s)",quality:"Core Strength",metric:"reps",time:"~2–3 min",
+        setup:["45° camera","Knees bent; form checks"]},
+      {id:10,name:"Endurance Run",quality:"Endurance",metric:"time",time:"~6–12 min",
+        setup:["Outdoor track preferred","U-12: 800m; 12+: 1.6km","GPS if available; fallback timing"]}
+    ];
 
     const e = React.createElement;
+    const mk = (t, p, ...c) => e(t, p, ...c);
 
-    function Badge({children, className=""}){
-      return e('span', {className: "inline-flex items-center px-2 py-1 text-xs font-semibold rounded-md "+className}, children);
+    function Badge({children, className=""}) {
+      return mk('span', {className:"inline-flex items-center px-2 py-1 text-xs font-semibold rounded-md "+className}, children);
     }
-
-    function NavLink({label, active}){
-      return e('div', {
-        className: "px-3 py-2 rounded-md text-sm font-semibold tracking-wide " + (active? "bg-govorange text-white":"text-white/90 hover:bg-white/10")
-      }, label);
+    function NavLink({label, active}) {
+      return mk('div', {className:"px-3 py-2 rounded-md text-sm font-semibold tracking-wide "+(active?"bg-govorange text-white":"text-white/90 hover:bg-white/10")}, label);
     }
-
     function Hero(){
-      return e('div', {className:"hero-bg rounded-3xl shadow-xl text-white relative"},
-        e('div', {className:"relative p-8 md:p-12"},
-          e('div', {className:"text-4xl md:text-6xl font-extrabold tracking-wider"}, "VIJETA"),
-          e('div', {className:"mt-2 text-lg md:text-2xl font-semibold opacity-90"},
+      return mk('div',{className:"hero-bg rounded-3xl shadow-xl text-white relative"},
+        mk('div',{className:"relative p-8 md:p-12"},
+          mk('div',{className:"text-4xl md:text-6xl font-extrabold tracking-wider"},"VIJETA"),
+          mk('div',{className:"mt-2 text-lg md:text-2xl font-semibold opacity-90"},
             "AI-Powered Mobile Platform for Democratizing Sports Talent Assessment"),
-          e('div', {className:"mt-6 flex flex-wrap items-center gap-3"},
-            e(Badge, {className:"bg-white/10 backdrop-blur"}, "Edge AI • Offline"),
-            e(Badge, {className:"bg-white/10 backdrop-blur"}, "Cheat Detection"),
-            e(Badge, {className:"bg-white/10 backdrop-blur"}, "Secure JSON + Signatures"),
-            e(Badge, {className:"bg-white/10 backdrop-blur"}, "Gov Cloud Ready"),
-          ),
-          e('div', {className:"mt-6 flex gap-3"},
-            e('a', {href:"#tests", className:"px-4 py-2 rounded-md text-white", style:{background:"#FF6A00"}}, "Try Prototype"),
-            e('a', {href:"#refs", className:"px-4 py-2 rounded-md bg-white/10 text-white border border-white/30"}, "View Docs")
+          mk('div',{className:"mt-6 flex flex-wrap items-center gap-3"},
+            mk(Badge,{className:"bg-white/10 backdrop-blur"},"Edge AI • Offline"),
+            mk(Badge,{className:"bg-white/10 backdrop-blur"},"Cheat Detection"),
+            mk(Badge,{className:"bg-white/10 backdrop-blur"},"Secure JSON + Signatures"),
+            mk(Badge,{className:"bg-white/10 backdrop-blur"},"Gov Cloud Ready")),
+          mk('div',{className:"mt-6 flex gap-3"},
+            mk('a',{href:"#tests",className:"px-4 py-2 rounded-md text-white",style:{background:"#FF6A00"}},"Try Prototype"),
+            mk('a',{href:"#refs",className:"px-4 py-2 rounded-md bg-white/10 text-white border border-white/30"},"View Docs")
           )
         )
       );
     }
-
     function TestCard({t, onOpen}){
-      return e('div', {className:"bg-white/95 rounded-xl p-4 hover:shadow-lg transition"},
-        e('div', {className:"flex items-start justify-between gap-3"},
-          e('div', null,
-            e('div', {className:"text-base font-bold"}, t.name),
-            e('div', {className:"text-sm text-slate-600"}, t.quality),
-            e('div', {className:"mt-1 text-xs text-slate-500"}, t.time),
-          ),
-          e('i', { 'data-lucide': 'medal', className:"w-5 h-5 text-slate-500"})
+      return mk('div',{className:"bg-white/95 rounded-xl p-4 hover:shadow-lg transition"},
+        mk('div',{className:"flex items-start justify-between gap-3"},
+          mk('div',null,
+            mk('div',{className:"text-base font-bold"},t.name),
+            mk('div',{className:"text-sm text-slate-600"},t.quality),
+            mk('div',{className:"mt-1 text-xs text-slate-500"},t.time)),
+          mk('i',{'data-lucide':'medal',className:"w-5 h-5 text-slate-500"})
         ),
-        e('div', {className:"mt-3 flex gap-2"},
-          e('button', {className:"px-3 py-2 rounded-md bg-slate-100", onClick:()=>alert("Setup for "+t.name+"\\n- "+t.setup.join("\\n- "))}, "How to set up"),
-          e('button', {className:"px-3 py-2 rounded-md text-white", style:{background:"#FF6A00"}, onClick:onOpen}, "Start")
+        mk('div',{className:"mt-3 flex gap-2"},
+          mk('button',{className:"px-3 py-2 rounded-md bg-slate-100",
+            onClick:()=>alert("Setup for "+t.name+"\n- "+t.setup.join("\n- "))},"How to set up"),
+          mk('button',{className:"px-3 py-2 rounded-md text-white",style:{background:"#FF6A00"},onClick:onOpen},"Start")
         )
       );
     }
-
     function CameraMock({active}){
-      const [status, setStatus] = React.useState('idle');
-      const [progress, setProgress] = React.useState(0);
+      const [status,setStatus] = React.useState('idle');
+      const [progress,setProgress] = React.useState(0);
       function run(){
         if(status==='recording') return;
         setStatus('recording'); setProgress(20);
@@ -93,61 +101,50 @@
         setTimeout(()=>{setStatus('processing'); setProgress(90)},1600);
         setTimeout(()=>{setStatus('done'); setProgress(100)},2300);
       }
-      return e('div', {className:"bg-black/80 rounded-xl overflow-hidden aspect-[9/16] w-full relative"},
-        e('div', {className:"absolute inset-0 grid place-items-center"},
-          e('i', { 'data-lucide':'camera', className:"w-16 h-16 text-white/60"}),
-          e('div', {className:"absolute top-3 left-3 flex gap-2"},
-            e(Badge, {className:"bg-green-600/80 text-white"}, "AI OK"),
-            e(Badge, {className:"bg-yellow-600/80 text-white"}, "Lighting"),
-            e(Badge, {className:"bg-blue-600/80 text-white"}, "Framing")
-          ),
-          e('div', {className:"absolute bottom-3 left-3 right-3"},
-            e('div', {className:"w-full h-2 bg-white/20 rounded-full overflow-hidden"},
-              e('div', {className:"h-2 bg-white", style:{width: progress+'%'}})
-            ),
-            e('div', {className:"mt-3 flex gap-2"},
-              e('button', {onClick:run, className:"px-4 py-2 rounded-md text-white", style:{background:"#FF6A00"}}, status==='recording'?'Stop':'Start Test'),
-              e('button', {className:"px-4 py-2 rounded-md bg-slate-100"}, "How to set up")
-            ),
-            e('div', {className:"mt-2 text-xs text-white/70"}, "Works offline. Uploads verified JSON; video only if flagged/opt‑in.")
+      return mk('div',{className:"bg-black/80 rounded-xl overflow-hidden aspect-[9/16] w-full relative"},
+        mk('div',{className:"absolute inset-0 grid place-items-center"},
+          mk('i',{'data-lucide':'camera',className:"w-16 h-16 text-white/60"}),
+          mk('div',{className:"absolute top-3 left-3 flex gap-2"},
+            mk(Badge,{className:"bg-green-600/80 text-white"},"AI OK"),
+            mk(Badge,{className:"bg-yellow-600/80 text-white"},"Lighting"),
+            mk(Badge,{className:"bg-blue-600/80 text-white"},"Framing")),
+          mk('div',{className:"absolute bottom-3 left-3 right-3"},
+            mk('div',{className:"w-full h-2 bg-white/20 rounded-full overflow-hidden"},
+              mk('div',{className:"h-2 bg-white",style:{width:progress+'%'}})),
+            mk('div',{className:"mt-3 flex gap-2"},
+              mk('button',{onClick:run,className:"px-4 py-2 rounded-md text-white",style:{background:"#FF6A00"}}, status==='recording'?'Stop':'Start Test'),
+              mk('button',{className:"px-4 py-2 rounded-md bg-slate-100"},"How to set up")),
+            mk('div',{className:"mt-2 text-xs text-white/70"},"Works offline. Uploads verified JSON; video only if flagged/opt-in.")
           )
         )
       );
     }
-
     function ResultsMock(){
-      return e('div', {className:"bg-white rounded-xl p-6 space-y-4"},
-        e('div', {className:"text-xl font-bold"}, "Result Summary"),
-        e('div', {className:"grid md:grid-cols-3 gap-3"},
-          e('div', {className:"bg-slate-50 rounded-lg p-4"}, 
-            e('div', {className:"text-sm text-slate-600"}, "Metric"),
-            e('div', {className:"text-2xl font-extrabold"}, "Jump Height: 43 cm")
-          ),
-          e('div', {className:"bg-slate-50 rounded-lg p-4"}, 
-            e('div', {className:"text-sm text-slate-600"}, "Percentile (M • 14–15)"),
-            e('div', {className:"text-2xl font-extrabold"}, "82nd")
-          ),
-          e('div', {className:"bg-slate-50 rounded-lg p-4"}, 
-            e('div', {className:"text-sm text-slate-600"}, "Badge"),
-            e('div', {className:"text-2xl font-extrabold flex items-center gap-2"},
-              e('i', { 'data-lucide':'award', className:"w-6 h-6"}), "Explosive • Bronze"
-            )
-          )
+      return mk('div',{className:"bg-white rounded-xl p-6 space-y-4"},
+        mk('div',{className:"text-xl font-bold"},"Result Summary"),
+        mk('div',{className:"grid md:grid-cols-3 gap-3"},
+          mk('div',{className:"bg-slate-50 rounded-lg p-4"},
+            mk('div',{className:"text-sm text-slate-600"},"Metric"),
+            mk('div',{className:"text-2xl font-extrabold"},"Jump Height: 43 cm")),
+          mk('div',{className:"bg-slate-50 rounded-lg p-4"},
+            mk('div',{className:"text-sm text-slate-600"},"Percentile (M • 14–15)"),
+            mk('div',{className:"text-2xl font-extrabold"},"82nd")),
+          mk('div',{className:"bg-slate-50 rounded-lg p-4"},
+            mk('div',{className:"text-sm text-slate-600"},"Badge"),
+            mk('div',{className:"text-2xl font-extrabold flex items-center gap-2"},
+              mk('i',{'data-lucide':'award',className:"w-6 h-6"}),"Explosive • Bronze"))
         ),
-        e('div', {className:"flex gap-2"},
-          e('button', {className:"px-3 py-2 rounded-md bg-slate-100"}, "Save offline"),
-          e('button', {className:"px-3 py-2 rounded-md text-white", style:{background:"#FF6A00"}}, "Sync when online"),
-          e('button', {className:"px-3 py-2 rounded-md border border-slate-300"}, "Retake"),
-        ),
-        e('div', {className:"text-xs text-slate-600 flex items-center gap-2"},
-          e('i', { 'data-lucide':'shield-check', className:"w-4 h-4"}),
-          "Ed25519 signature • Encrypted local queue • HTTPS sync • Video only if flagged"
-        )
+        mk('div',{className:"flex gap-2"},
+          mk('button',{className:"px-3 py-2 rounded-md bg-slate-100"},"Save offline"),
+          mk('button',{className:"px-3 py-2 rounded-md text-white",style:{background:"#FF6A00"}},"Sync when online"),
+          mk('button',{className:"px-3 py-2 rounded-md border border-slate-300"},"Retake")),
+        mk('div',{className:"text-xs text-slate-600 flex items-center gap-2"},
+          mk('i',{'data-lucide':'shield-check',className:"w-4 h-4"}),
+          "Ed25519 signature • Encrypted local queue • HTTPS sync • Video only if flagged")
       );
     }
-
     function LeaderboardMock(){
-      const rows = [
+      const rows=[
         {rank:1,name:"A. Kumar",score:92,percentile:98,flagged:"No"},
         {rank:2,name:"R. Das",score:90,percentile:96,flagged:"No"},
         {rank:3,name:"S. Yadav",score:88,percentile:94,flagged:"Yes"},
@@ -155,125 +152,116 @@
         {rank:5,name:"P. Kaur",score:84,percentile:90,flagged:"No"},
         {rank:6,name:"V. Sharma",score:83,percentile:89,flagged:"No"},
       ];
-      return e('div', {className:"bg-white rounded-xl p-6 overflow-x-auto"},
-        e('div', {className:"text-xl font-bold mb-3"}, "Leaderboard & Flags"),
-        e('table', {className:"min-w-full text-sm"},
-          e('thead', {className:"text-left text-slate-600"},
-            e('tr', null,
-              e('th', {className:"py-2 pr-4"}, "Rank"),
-              e('th', {className:"py-2 pr-4"}, "Athlete"),
-              e('th', {className:"py-2 pr-4"}, "Score"),
-              e('th', {className:"py-2 pr-4"}, "Percentile"),
-              e('th', {className:"py-2 pr-0"}, "Flag")
-            )
-          ),
-          e('tbody', null,
-            rows.map(r=> e('tr', {key:r.rank, className: r.flagged==="Yes"?"bg-amber-50":""},
-              e('td', {className:"py-2 pr-4"}, r.rank),
-              e('td', {className:"py-2 pr-4"}, r.name),
-              e('td', {className:"py-2 pr-4"}, r.score),
-              e('td', {className:"py-2 pr-4"}, r.percentile),
-              e('td', {className:"py-2 pr-0"}, r.flagged)
-            ))
-          )
+      return mk('div',{className:"bg-white rounded-xl p-6 overflow-x-auto"},
+        mk('div',{className:"text-xl font-bold mb-3"},"Leaderboard & Flags"),
+        mk('table',{className:"min-w-full text-sm"},
+          mk('thead',{className:"text-left text-slate-600"},
+            mk('tr',null,
+              mk('th',{className:"py-2 pr-4"},"Rank"),
+              mk('th',{className:"py-2 pr-4"},"Athlete"),
+              mk('th',{className:"py-2 pr-4"},"Score"),
+              mk('th',{className:"py-2 pr-4"},"Percentile"),
+              mk('th',{className:"py-2 pr-0"},"Flag"))),
+          mk('tbody',null, rows.map(r =>
+            mk('tr',{key:r.rank,className:r.flagged==="Yes"?"bg-amber-50":""},
+              mk('td',{className:"py-2 pr-4"},r.rank),
+              mk('td',{className:"py-2 pr-4"},r.name),
+              mk('td',{className:"py-2 pr-4"},r.score),
+              mk('td',{className:"py-2 pr-4"},r.percentile),
+              mk('td',{className:"py-2 pr-0"},r.flagged)
+            )))
         )
       );
     }
-
     function OfficialsMock(){
-      return e('div', {className:"bg-white rounded-xl p-6 space-y-3"},
-        e('div', {className:"text-xl font-bold"}, "Officials Dashboard (Preview)"),
-        e('div', {className:"text-sm text-slate-600"},
-          "Filter by region, age, gender, percentile bands. Host on NIC / AWS GovStack. Backend: Node.js/Django • DB: MySQL/Redis."
-        ),
-        e('div', {className:"grid md:grid-cols-3 gap-3"},
-          e('div', {className:"bg-slate-50 rounded-lg p-4"}, e('div', {className:"text-xs text-slate-600"}, "Total Verified Submissions"), e('div', {className:"text-2xl font-extrabold"}, "12,584")),
-          e('div', {className:"bg-slate-50 rounded-lg p-4"}, e('div', {className:"text-xs text-slate-600"}, "Flags for Review"), e('div', {className:"text-2xl font-extrabold"}, "312")),
-          e('div', {className:"bg-slate-50 rounded-lg p-4"}, e('div', {className:"text-xs text-slate-600"}, "Sync Queue"), e('div', {className:"text-2xl font-extrabold"}, "1,104 offline")),
-        ),
-        e('div', {className:"text-xs text-slate-600 flex items-center gap-2"},
-          e('i', { 'data-lucide':'info', className:"w-4 h-4"}),
-          "Security: Ed25519 signatures; encrypted local queue; HTTPS; videos uploaded only if flagged/opt‑in; fairness checks (frame drop, speed anomalies, wrong angle, face re-verify)."
-        )
+      return mk('div',{className:"bg-white rounded-xl p-6 space-y-3"},
+        mk('div',{className:"text-xl font-bold"},"Officials Dashboard (Preview)"),
+        mk('div',{className:"text-sm text-slate-600"},
+          "Filter by region, age, gender, percentile bands. Host on NIC / AWS GovStack. Backend: Node.js/Django • DB: MySQL/Redis."),
+        mk('div',{className:"grid md:grid-cols-3 gap-3"},
+          mk('div',{className:"bg-slate-50 rounded-lg p-4"},
+            mk('div',{className:"text-xs text-slate-600"},"Total Verified Submissions"),
+            mk('div',{className:"text-2xl font-extrabold"},"12,584")),
+          mk('div',{className:"bg-slate-50 rounded-lg p-4"},
+            mk('div',{className:"text-xs text-slate-600"},"Flags for Review"),
+            mk('div',{className:"text-2xl font-extrabold"},"312")),
+          mk('div',{className:"bg-slate-50 rounded-lg p-4"},
+            mk('div',{className:"text-xs text-slate-600"},"Sync Queue"),
+            mk('div',{className:"text-2xl font-extrabold"},"1,104 offline"))),
+        mk('div',{className:"text-xs text-slate-600 flex items-center gap-2"},
+          mk('i',{'data-lucide':'info',className:"w-4 h-4"}),
+          "Security: Ed25519 signatures; encrypted local queue; HTTPS; videos uploaded only if flagged/opt-in; fairness checks (frame drop, speed anomalies, wrong angle, face re-verify).")
       );
     }
 
     function App(){
-      const [tab, setTab] = React.useState('tests');
-      const [active, setActive] = React.useState(TESTS[3]);
-      const [query, setQuery] = React.useState('');
+      const [tab,setTab] = React.useState('tests');
+      const [active,setActive] = React.useState(TESTS[3]);
+      const [query,setQuery] = React.useState('');
       const filtered = TESTS.filter(t => t.name.toLowerCase().includes(query.toLowerCase()));
 
-      React.useEffect(()=>{ lucide.createIcons(); });
+      // re-render icons only when state changes (no infinite loop)
+      React.useEffect(()=>{ if (window.lucide) window.lucide.createIcons(); }, [tab,active,query]);
 
-      return e('div', null,
-        // Top bar
-        e('div', {className:"sticky top-0 z-50 border-b border-white/10"},
-          e('div', {className:"max-w-6xl mx-auto px-4 py-3 flex items-center justify-between", style:{background:'#0A1A3B'}},
-            e('div', {className:"flex items-center gap-3 text-white"},
-              e('div', {className:"text-2xl font-extrabold tracking-widest"}, "VIJETA"),
-              e(Badge, {className:"bg-white/10 text-white border border-white/20"}, "SIH 25073")
-            ),
-            e('div', {className:"hidden md:flex items-center gap-2 text-white"},
-              e(NavLink, {label:"HOME", active:true}),
-              e(NavLink, {label:"ABOUT US"}),
-              e(NavLink, {label:"DASHBOARD"}),
-              e(NavLink, {label:"TESTS"}),
-              e(NavLink, {label:"RESOURCES"}),
-            ),
-            e('div', {className:"hidden md:flex items-center gap-2"},
-              e('input', {value:query, onChange:e=>setQuery(e.target.value), placeholder:"Search tests",
-                           className:"bg-white/95 w-44 px-3 py-2 rounded-md"}),
-              e('a', {href:"#tests", className:"px-3 py-2 rounded-md text-white", style:{background:'#FF6A00'}}, "Search")
-            )
+      return mk('div',null,
+        mk('div',{className:"sticky top-0 z-50 border-b border-white/10"},
+          mk('div',{className:"max-w-6xl mx-auto px-4 py-3 flex items-center justify-between",style:{background:'#0A1A3B'}},
+            mk('div',{className:"flex items-center gap-3 text-white"},
+              mk('div',{className:"text-2xl font-extrabold tracking-widest"},"VIJETA"),
+              mk(Badge,{className:"bg-white/10 text-white border border-white/20"},"SIH 25073")),
+            mk('div',{className:"hidden md:flex items-center gap-2 text-white"},
+              mk(NavLink,{label:"HOME",active:true}),
+              mk(NavLink,{label:"ABOUT US"}),
+              mk(NavLink,{label:"DASHBOARD"}),
+              mk(NavLink,{label:"TESTS"}),
+              mk(NavLink,{label:"RESOURCES"})),
+            mk('div',{className:"hidden md:flex items-center gap-2"},
+              mk('input',{value:query,onChange:e=>setQuery(e.target.value),placeholder:"Search tests",
+                          className:"bg-white/95 w-44 px-3 py-2 rounded-md"}),
+              mk('a',{href:"#tests",className:"px-3 py-2 rounded-md text-white",style:{background:'#FF6A00'}},"Search"))
           )
         ),
 
-        e('div', {className:"max-w-6xl mx-auto px-4 py-6 space-y-6"},
-          e(Hero, null),
+        mk('div',{className:"max-w-6xl mx-auto px-4 py-6 space-y-6"},
+          mk(Hero,null),
 
-          e('div', {id:"tests", className:"mt-2"},
-            e('div', {className:"flex gap-2 text-white/90"}, 
-              e('button', {onClick:()=>setTab('tests'), className:"px-3 py-2 rounded-md "+(tab==='tests'?'bg-white/20':'bg-white/10')}, "Tests"),
-              e('button', {onClick:()=>setTab('record'), className:"px-3 py-2 rounded-md "+(tab==='record'?'bg-white/20':'bg-white/10')}, "Record"),
-              e('button', {onClick:()=>setTab('results'), className:"px-3 py-2 rounded-md "+(tab==='results'?'bg-white/20':'bg-white/10')}, "Results"),
-              e('button', {onClick:()=>setTab('leader'), className:"px-3 py-2 rounded-md "+(tab==='leader'?'bg-white/20':'bg-white/10')}, "Leaderboard"),
-              e('button', {onClick:()=>setTab('officials'), className:"px-3 py-2 rounded-md "+(tab==='officials'?'bg-white/20':'bg-white/10')}, "Officials Dashboard"),
+          mk('div',{id:"tests",className:"mt-2"},
+            mk('div',{className:"flex gap-2 text-white/90"},
+              mk('button',{onClick:()=>setTab('tests'),className:"px-3 py-2 rounded-md "+(tab==='tests'?'bg-white/20':'bg-white/10')},"Tests"),
+              mk('button',{onClick:()=>setTab('record'),className:"px-3 py-2 rounded-md "+(tab==='record'?'bg-white/20':'bg-white/10')},"Record"),
+              mk('button',{onClick:()=>setTab('results'),className:"px-3 py-2 rounded-md "+(tab==='results'?'bg-white/20':'bg-white/10')},"Results"),
+              mk('button',{onClick:()=>setTab('leader'),className:"px-3 py-2 rounded-md "+(tab==='leader'?'bg-white/20':'bg-white/10')},"Leaderboard"),
+              mk('button',{onClick:()=>setTab('officials'),className:"px-3 py-2 rounded-md "+(tab==='officials'?'bg-white/20':'bg-white/10')},"Officials Dashboard")),
+
+            (tab==='tests') && mk('div',{className:"grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"},
+              filtered.map(t => mk(TestCard,{key:t.id,t,onOpen:()=>{setActive(t); setTab('record');}}))),
+
+            (tab==='tests') && mk('div',{className:"mt-4 text-white/80 text-sm flex items-center gap-2"},
+              mk('i',{'data-lucide':'wifi-off',className:"w-4 h-4"}),"Works offline on entry-level phones; optimized models (pruning + quantization)."),
+
+            (tab==='record') && mk('div',{className:"mt-4"},
+              mk('div',{className:"text-white font-semibold mb-2"},"Recording — ",
+                mk('span',{className:"text-white/90"}, active && active.name)),
+              mk(CameraMock,{active})
             ),
-            (tab==='tests') && e('div', {className:"grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"},
-              filtered.map(t => e(TestCard, {key:t.id, t, onOpen:()=>{setActive(t); setTab('record');}}))
-            ),
-            (tab==='tests') && e('div', {className:"mt-4 text-white/80 text-sm flex items-center gap-2"},
-              e('i', { 'data-lucide':'wifi-off', className:"w-4 h-4"}), "Works offline on entry‑level phones; optimized models (pruning + quantization)."
-            ),
 
-            (tab==='record') && e('div', {className:"mt-4"},
-              e('div', {className:"text-white font-semibold mb-2"}, "Recording — ", e('span', {className:"text-white/90"}, active && active.name)),
-              e(CameraMock, {active})
-            ),
-
-            (tab==='results') && e('div', {className:"mt-4"}, e(ResultsMock)),
-
-            (tab==='leader') && e('div', {className:"mt-4"}, e(LeaderboardMock)),
-
-            (tab==='officials') && e('div', {className:"mt-4"}, e(OfficialsMock)),
+            (tab==='results') && mk('div',{className:"mt-4"}, mk(ResultsMock)),
+            (tab==='leader') && mk('div',{className:"mt-4"}, mk(LeaderboardMock)),
+            (tab==='officials') && mk('div',{className:"mt-4"}, mk(OfficialsMock))
           )
         ),
 
-        e('footer', {className:"mt-10 border-t border-white/10"},
-          e('div', {className:"max-w-6xl mx-auto px-4 py-8 text-white/80 text-sm grid md:grid-cols-3 gap-4"},
-            e('div', null,
-              e('div', {className:"font-bold text-white"}, "Ministry of Youth Affairs & Sports"),
-              e('div', null, "Sports Authority of India (SAI) • SIH 2025")
-            ),
-            e('div', {id:"refs"}, 
-              e('div', {className:"font-bold text-white"}, "References"),
-              e('div', null, "MediaPipe Pose • TensorFlow Lite (Optimization) • NIC / GovStack")
-            ),
-            e('div', null,
-              e('div', {className:"font-bold text-white"}, "Contact"),
-              e('div', null, "Team Neon • Project \"Vijeta\"")
-            )
+        mk('footer',{className:"mt-10 border-t border-white/10"},
+          mk('div',{className:"max-w-6xl mx-auto px-4 py-8 text-white/80 text-sm grid md:grid-cols-3 gap-4"},
+            mk('div',null,
+              mk('div',{className:"font-bold text-white"},"Ministry of Youth Affairs & Sports"),
+              mk('div',null,"Sports Authority of India (SAI) • SIH 2025")),
+            mk('div',{id:"refs"},
+              mk('div',{className:"font-bold text-white"},"References"),
+              mk('div',null,"MediaPipe Pose • TensorFlow Lite (Optimization) • NIC / GovStack")),
+            mk('div',null,
+              mk('div',{className:"font-bold text-white"},"Contact"),
+              mk('div',null,"Team Neon • Project \"Vijeta\""))
           )
         )
       );
@@ -281,10 +269,6 @@
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(e(App));
-
-    // refresh lucide icons on DOM changes
-    const mo = new MutationObserver(()=> lucide.createIcons());
-    mo.observe(document.body, {childList:true, subtree:true});
   </script>
 </body>
 </html>
