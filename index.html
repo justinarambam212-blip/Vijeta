@@ -46,4 +46,297 @@
         setup:["Two lines 10 m apart","Side-on camera","AI line touches + total time"]},
       {id:9,name:"Sit-ups (60s)",quality:"Core Strength",metric:"reps",time:"~2–3 min",
         setup:["45° camera","Knees bent; form checks"]},
-      {id:10,name:"Endurance Run",quality:"Enduran
+      {id:10,name:"Endurance Run",quality:"Endurance",metric:"time",time:"~6–12 min",
+        setup:["Outdoor track preferred","U-12: 800m; 12+: 1.6km","GPS if available; fallback timing"]}
+    ];
+
+    const e = React.createElement;
+    const mk = (t, p, ...c) => e(t, p, ...c);
+
+    /* ---------- UI atoms ---------- */
+    function Badge({children, className=""}) {
+      return mk('span', {className:"inline-flex items-center px-2 py-1 text-xs font-semibold rounded-md "+className}, children);
+    }
+    function NavButton({label, active, onClick}) {
+      return mk('button', {onClick, className:"px-3 py-2 rounded-md text-sm font-semibold tracking-wide "+
+        (active? "bg-white/20 text-white":"bg-white/10 text-white/90 hover:bg-white/20")}, label);
+    }
+    function Pill({children, className="", ...rest}) {
+      return mk('span', {className:"pill border border-white/20 text-white/90 "+className, ...rest}, children);
+    }
+
+    /* ---------- Auth & role ---------- */
+    function AuthBar({role, setRole, isAuthed, setAuthed, isVerified, setVerified}) {
+      return mk('div', {className:"flex items-center gap-2"},
+        !isAuthed && mk('div', {className:"hidden md:flex items-center gap-2"},
+          mk('button', {onClick:()=>setRole('athlete'),
+            className:"px-3 py-2 rounded-md bg-white/10 text-white hover:bg-white/20"}, "Athlete Portal"),
+          mk('button', {onClick:()=>setRole('official'),
+            className:"px-3 py-2 rounded-md bg-white/10 text-white hover:bg-white/20"}, "SAI Officials")
+        ),
+        !isAuthed
+          ? mk('button', {onClick:()=>setAuthed(true), className:"px-3 py-2 rounded-md text-white", style:{background:'#FF6A00'}}, "Login / Sign up")
+          : mk('div', {className:"flex items-center gap-2"},
+              mk(Pill, null, role==='official' ? "Official" : "Athlete"),
+              mk(Pill, {className: isVerified? "border-green-400 text-green-200":"border-amber-400 text-amber-200"},
+                isVerified? "KYC: Verified" : "KYC: Not Verified"),
+              mk('button', {onClick:()=>{setAuthed(false); setVerified(false);}, className:"px-3 py-2 rounded-md bg-white/10 text-white/80 hover:bg-white/20"}, "Logout")
+            )
+      );
+    }
+
+    /* ---------- Hero ---------- */
+    function Hero({goTests}) {
+      return mk('div',{className:"hero-bg rounded-3xl shadow-xl text-white relative"},
+        mk('div',{className:"relative p-8 md:p-12"},
+          mk('div',{className:"text-4xl md:text-6xl font-extrabold tracking-wider"},"VIJETA"),
+          mk('div',{className:"mt-2 text-lg md:text-2xl font-semibold opacity-90"},
+            "AI-Powered Mobile Platform for Democratizing Sports Talent Assessment"),
+          mk('div',{className:"mt-6 flex flex-wrap items-center gap-3"},
+            mk(Badge,{className:"bg-white/10 backdrop-blur"},"Edge AI • Offline"),
+            mk(Badge,{className:"bg-white/10 backdrop-blur"},"Cheat Detection"),
+            mk(Badge,{className:"bg-white/10 backdrop-blur"},"Secure by Design"),
+            mk(Badge,{className:"bg-white/10 backdrop-blur"},"Gov Cloud Ready")),
+          mk('div',{className:"mt-6 flex gap-3"},
+            mk('a',{href:"#tests",onClick:goTests,className:"px-4 py-2 rounded-md text-white",style:{background:"#FF6A00"}}, "Get Started"),
+            mk('a',{href:"#resources",className:"px-4 py-2 rounded-md bg-white/10 text-white border border-white/30"},"Resources")
+          )
+        )
+      );
+    }
+
+    /* ---------- Test card ---------- */
+    function TestCard({t, onStart, onHow}) {
+      return mk('div',{className:"bg-white/95 rounded-xl p-4 hover:shadow-lg transition"},
+        mk('div',{className:"flex items-start justify-between gap-3"},
+          mk('div',null,
+            mk('div',{className:"text-base font-bold"},t.name),
+            mk('div',{className:"text-sm text-slate-600"},t.quality),
+            mk('div',{className:"mt-1 text-xs text-slate-500"},t.time)),
+          mk('i',{'data-lucide':'medal',className:"w-5 h-5 text-slate-500"})
+        ),
+        mk('div',{className:"mt-3 flex items-center gap-2"},
+          mk('button',{className:"px-3 py-2 rounded-md bg-slate-100", onClick:onHow},"How to set up"),
+          mk('button',{className:"px-3 py-2 rounded-md text-white", style:{background:"#FF6A00"}, onClick:onStart},"Start")
+        )
+      );
+    }
+
+    /* ---------- Camera / Results / Leaderboard / Officials ---------- */
+    function CameraMock({active}) {
+      const [status,setStatus]=React.useState('idle');
+      const [progress,setProgress]=React.useState(0);
+      function run(){ if(status==='recording') return;
+        setStatus('recording'); setProgress(20);
+        setTimeout(()=>setProgress(60),800);
+        setTimeout(()=>{setStatus('processing'); setProgress(90)},1600);
+        setTimeout(()=>{setStatus('done'); setProgress(100)},2300);
+      }
+      return mk('div',{className:"bg-black/80 rounded-xl overflow-hidden aspect-[9/16] w-full relative"},
+        mk('div',{className:"absolute inset-0 grid place-items-center"},
+          mk('i',{'data-lucide':'camera',className:"w-16 h-16 text-white/60"}),
+          mk('div',{className:"absolute top-3 left-3 flex gap-2"},
+            mk(Badge,{className:"bg-green-600/80 text-white"},"AI OK"),
+            mk(Badge,{className:"bg-yellow-600/80 text-white"},"Lighting"),
+            mk(Badge,{className:"bg-blue-600/80 text-white"},"Framing")),
+          mk('div',{className:"absolute bottom-3 left-3 right-3"},
+            mk('div',{className:"w-full h-2 bg-white/20 rounded-full overflow-hidden"},
+              mk('div',{className:"h-2 bg-white",style:{width:progress+'%'}})),
+            mk('div',{className:"mt-3 flex gap-2"},
+              mk('button',{onClick:run,className:"px-4 py-2 rounded-md text-white",style:{background:"#FF6A00"}}, status==='recording'?'Stop':'Start Test'),
+              mk('button',{className:"px-4 py-2 rounded-md bg-slate-100"},"How to set up")),
+            mk('div',{className:"mt-2 text-xs text-white/70"},"Works offline. Uploads verified JSON; video only if flagged/opt-in.")
+          )
+        )
+      );
+    }
+    function ResultsMock(){
+      return mk('div',{className:"bg-white rounded-xl p-6 space-y-4"},
+        mk('div',{className:"text-xl font-bold"},"Result Summary"),
+        mk('div',{className:"grid md:grid-cols-3 gap-3"},
+          mk('div',{className:"bg-slate-50 rounded-lg p-4"}, mk('div',{className:"text-sm text-slate-600"},"Metric"), mk('div',{className:"text-2xl font-extrabold"},"Jump Height: 43 cm")),
+          mk('div',{className:"bg-slate-50 rounded-lg p-4"}, mk('div',{className:"text-sm text-slate-600"},"Percentile (M • 14–15)"), mk('div',{className:"text-2xl font-extrabold"},"82nd")),
+          mk('div',{className:"bg-slate-50 rounded-lg p-4"}, mk('div',{className:"text-sm text-slate-600"},"Badge"), mk('div',{className:"text-2xl font-extrabold flex items-center gap-2"}, mk('i',{'data-lucide':'award',className:"w-6 h-6"}),"Explosive • Bronze"))
+        ),
+        mk('div',{className:"flex gap-2"},
+          mk('button',{className:"px-3 py-2 rounded-md bg-slate-100"},"Save offline"),
+          mk('button',{className:"px-3 py-2 rounded-md text-white",style:{background:"#FF6A00"}},"Sync when online"),
+          mk('button',{className:"px-3 py-2 rounded-md border border-slate-300"},"Retake")),
+        mk('div',{className:"text-xs text-slate-600 flex items-center gap-2"}, mk('i',{'data-lucide':'shield-check',className:"w-4 h-4"}),"Ed25519 signature • Encrypted local queue • HTTPS sync • Video only if flagged")
+      );
+    }
+    function Leaderboard(){
+      const [state,setState]=React.useState("Delhi");
+      const [district,setDistrict]=React.useState("New Delhi");
+      const [gender,setGender]=React.useState("Male");
+      const rows=[
+        {rank:1,name:"A. Kumar",score:92,percentile:98,flagged:"No"},
+        {rank:2,name:"R. Das",score:90,percentile:96,flagged:"No"},
+        {rank:3,name:"S. Yadav",score:88,percentile:94,flagged:"Yes"},
+        {rank:4,name:"K. Singh",score:86,percentile:92,flagged:"No"},
+        {rank:5,name:"P. Kaur",score:84,percentile:90,flagged:"No"},
+      ];
+      return mk('div',{className:"bg-white rounded-xl p-6"},
+        mk('div',{className:"flex flex-wrap gap-3 mb-4"},
+          mk('select',{className:"px-3 py-2 rounded-md bg-slate-100", value:state,onChange:e=>setState(e.target.value)},
+            mk('option',null,"Delhi"), mk('option',null,"Maharashtra"), mk('option',null,"Odisha"), mk('option',null,"Haryana")),
+          mk('select',{className:"px-3 py-2 rounded-md bg-slate-100", value:district,onChange:e=>setDistrict(e.target.value)},
+            mk('option',null,"New Delhi"), mk('option',null,"South West"), mk('option',null,"Pune"), mk('option',null,"Bhubaneswar")),
+          mk('select',{className:"px-3 py-2 rounded-md bg-slate-100", value:gender,onChange:e=>setGender(e.target.value)},
+            mk('option',null,"Male"), mk('option',null,"Female"))
+        ),
+        mk('div',{className:"text-xs text-slate-600 mb-2"}, `Leaderboard — ${state} • ${district} • ${gender}`),
+        mk('div',{className:"overflow-x-auto"},
+          mk('table',{className:"min-w-full text-sm"},
+            mk('thead',{className:"text-left text-slate-600"},
+              mk('tr',null,
+                mk('th',{className:"py-2 pr-4"},"Rank"),
+                mk('th',{className:"py-2 pr-4"},"Athlete"),
+                mk('th',{className:"py-2 pr-4"},"Score"),
+                mk('th',{className:"py-2 pr-4"},"Percentile"),
+                mk('th',{className:"py-2 pr-0"},"Flag"))),
+            mk('tbody',null, rows.map(r =>
+              mk('tr',{key:r.rank,className:r.flagged==="Yes"?"bg-amber-50":""},
+                mk('td',{className:"py-2 pr-4"},r.rank),
+                mk('td',{className:"py-2 pr-4"},r.name),
+                mk('td',{className:"py-2 pr-4"},r.score),
+                mk('td',{className:"py-2 pr-4"},r.percentile),
+                mk('td',{className:"py-2 pr-0"},r.flagged)
+              )))
+          )
+        )
+      );
+    }
+    function OfficialsDashboard(){
+      return mk('div',{className:"bg-white rounded-xl p-6 space-y-3"},
+        mk('div',{className:"text-xl font-bold"},"SAI Officials — Overview"),
+        mk('div',{className:"grid md:grid-cols-3 gap-3"},
+          mk('div',{className:"bg-slate-50 rounded-lg p-4"}, mk('div',{className:"text-xs text-slate-600"},"Total Verified Submissions"), mk('div',{className:"text-2xl font-extrabold"},"12,584")),
+          mk('div',{className:"bg-slate-50 rounded-lg p-4"}, mk('div',{className:"text-xs text-slate-600"},"Flags for Review"), mk('div',{className:"text-2xl font-extrabold"},"312")),
+          mk('div',{className:"bg-slate-50 rounded-lg p-4"}, mk('div',{className:"text-xs text-slate-600"},"Sync Queue"), mk('div',{className:"text-2xl font-extrabold"},"1,104 offline"))
+        ),
+        mk('div',{className:"text-xs text-slate-600 flex items-center gap-2"},
+          mk('i',{'data-lucide':'info',className:"w-4 h-4"}),
+          "Security: signatures; encrypted queue; HTTPS; videos only if flagged/opt-in.")
+      );
+    }
+
+    /* ---------- Resources & About placeholders ---------- */
+    function About(){
+      return mk('div',{className:"bg-white rounded-xl p-6 space-y-2"},
+        mk('div',{className:"text-xl font-bold"},"About the Programme"),
+        mk('p',null,"An initiative under the Ministry of Youth Affairs & Sports to democratize talent identification using mobile AI."),
+        mk('ul',{className:"list-disc ml-5 text-sm text-slate-700"},
+          mk('li',null,"Standardized tests (Annexure A)"),
+          mk('li',null,"On-device verification & cheat detection"),
+          mk('li',null,"Secure submission to SAI for profiling"))
+      );
+    }
+    function Resources(){
+      return mk('div',{className:"bg-white rounded-xl p-6 space-y-2"},
+        mk('div',{className:"text-xl font-bold"},"Resources & Guides"),
+        mk('ul',{className:"list-disc ml-5 text-sm text-slate-700"},
+          mk('li',null,"Annexure A — Test Protocols (PDF)"),
+          mk('li',null,"How-to videos for each test"),
+          mk('li',null,"Privacy Policy, Terms, Consent Statement"),
+          mk('li',null,"FAQs, Grievances & Support"))
+      );
+    }
+
+    /* ---------- App ---------- */
+    function App(){
+      const [section,setSection] = React.useState('home');       // home | about | tests | record | results | leader | officials | resources
+      const [role,setRole] = React.useState('athlete');          // athlete | official
+      const [isAuthed,setAuthed] = React.useState(false);
+      const [isVerified,setVerified] = React.useState(false);
+      const [active,setActive] = React.useState(TESTS[3]);
+      const [query,setQuery] = React.useState('');
+      const filtered = TESTS.filter(t => t.name.toLowerCase().includes(query.toLowerCase()));
+
+      React.useEffect(()=>{ if (window.lucide) window.lucide.createIcons(); }, [section,active,query,isAuthed,isVerified,role]);
+
+      function startTest(t){
+        if(!isAuthed) { alert("Please Login/Sign up to continue."); return; }
+        if(!isVerified) { alert("KYC/Aadhaar not verified. Please verify to take the official test."); return; }
+        setActive(t); setSection('record');
+      }
+
+      function howTo(t){
+        alert("Setup for "+t.name+"\n- "+t.setup.join("\n- "));
+      }
+
+      function goTests(e){ e && e.preventDefault(); setSection('tests'); }
+
+      return mk('div',null,
+        /* Top bar */
+        mk('div',{className:"sticky top-0 z-50 border-b border-white/10"},
+          mk('div',{className:"max-w-6xl mx-auto px-4 py-3 flex items-center justify-between",style:{background:'#0A1A3B'}},
+            mk('div',{className:"flex items-center gap-3 text-white"},
+              mk('div',{className:"text-2xl font-extrabold tracking-widest"},"VIJETA")),
+            mk('div',{className:"hidden md:flex items-center gap-2 text-white"},
+              mk(NavButton,{label:"HOME",active:section==='home',onClick:()=>setSection('home')}),
+              mk(NavButton,{label:"ABOUT US",active:section==='about',onClick:()=>setSection('about')}),
+              mk(NavButton,{label:"TESTS",active:section==='tests',onClick:()=>setSection('tests')}),
+              mk(NavButton,{label:"RESULTS",active:section==='results',onClick:()=>setSection('results')}),
+              mk(NavButton,{label:"LEADERBOARD",active:section==='leader',onClick:()=>setSection('leader')}),
+              mk(NavButton,{label:"OFFICIALS DASHBOARD",active:section==='officials',onClick:()=>{setRole('official'); setSection('officials');}})
+            ),
+            mk(AuthBar,{role,setRole,isAuthed,setAuthed,isVerified,setVerified})
+          )
+        ),
+
+        /* Body */
+        mk('div',{className:"max-w-6xl mx-auto px-4 py-6 space-y-6"},
+          section==='home' && mk(Hero,{goTests}),
+          section==='about' && mk(About),
+          section==='resources' && mk(Resources),
+
+          section==='tests' && mk('div',null,
+            !isVerified && isAuthed && role==='athlete' && mk('div',{className:"bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4"},
+              mk('div',{className:"font-semibold mb-1"},"Verification required"),
+              mk('div',{className:"text-sm"},"To attempt official tests and appear on the leaderboard, please complete Aadhaar/KYC verification."),
+              mk('div',{className:"mt-2"}, mk('button',{onClick:()=>setVerified(true), className:"px-3 py-2 rounded-md text-white", style:{background:'#FF6A00'}}, "Verify now (demo)"))
+            ),
+            mk('div',{className:"flex items-center gap-2 mt-2"},
+              mk('input',{value:query,onChange:e=>setQuery(e.target.value), placeholder:"Search tests", className:"bg-white/95 w-48 px-3 py-2 rounded-md"}),
+              mk('span',{className:"text-white/80 text-sm"},"All 10 tests from Annexure A")),
+            mk('div',{className:"grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"},
+              filtered.map(t => mk(TestCard,{key:t.id,t,onStart:()=>startTest(t),onHow:()=>howTo(t)}))),
+            mk('div',{className:"mt-4 text-white/80 text-sm flex items-center gap-2"},
+              mk('i',{'data-lucide':'wifi-off',className:"w-4 h-4"}),"Works offline on entry-level phones; optimized models (pruning + quantization).")
+          ),
+
+          section==='record' && mk('div',null,
+            mk('div',{className:"text-white font-semibold mb-2"},"Recording — ", mk('span',{className:"text-white/90"}, active && active.name)),
+            mk(CameraMock,{active})
+          ),
+
+          section==='results' && mk(ResultsMock),
+          section==='leader' && mk(Leaderboard),
+          section==='officials' && (role==='official'
+            ? mk(OfficialsDashboard)
+            : mk('div',{className:"bg-white rounded-xl p-6"}, "Officials access only. Please switch to SAI Officials role and login."))
+        ),
+
+        /* Footer */
+        mk('footer',{className:"mt-10 border-top border-white/10"},
+          mk('div',{className:"max-w-6xl mx-auto px-4 py-8 text-white/80 text-sm grid md:grid-cols-3 gap-4"},
+            mk('div',null,
+              mk('div',{className:"font-bold text-white"},"Ministry of Youth Affairs & Sports"),
+              mk('div',null,"Sports Authority of India (SAI)")),
+            mk('div',null,
+              mk('div',{className:"font-bold text-white"},"Useful Links"),
+              mk('div',null,"Privacy • Terms • Accessibility • Grievances")),
+            mk('div',null,
+              mk('div',{className:"font-bold text-white"},"Developed by Team Neon"),
+              mk('div',null,"© 2025 • All rights reserved"))
+          )
+        )
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(e(App));
+  </script>
+</body>
+</html>
